@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        google.load("visualization", "1", {packages: ["corechart"]});
+        var genres = {{ genres }};
+        var options12 = {
+            title: 'Document regions for components one and two',
+            hAxis: {title: 'First principal component',
+                    viewWindowMode:'explicit',
+                    viewWindow:{
+                        min:-8, max:8
+                    },
+                    ticks: [-8,-6,-4,-2,0,2,4,6,8]
+            },
+            vAxis: {title: 'Second principal component',
+                viewWindowMode: 'explicit',
+                viewWindow: {
+                    min: -4, max: 8
+                },
+                ticks: [-4,-2,0,2,4,6,8]
+            },
+            legend: 'right',
+            pointSize: 5
+        };
+        var options34 = {
+            title: 'Document regions for components three and four',
+            hAxis: {title: 'Third principal component',
+                    viewWindowMode:'explicit',
+                    viewWindow:{
+                        min:-8, max:8
+                    },
+                    ticks: [-8,-6,-4,-2,0,2,4,6,8]
+            },
+            vAxis: {title: 'Fourth principal component',
+                viewWindowMode: 'explicit',
+                viewWindow: {
+                    min: -6, max: 6
+                },
+                ticks: [-6,-4,-2,0,2,4,6]
+            },
+            legend: 'right',
+            pointSize: 5
+        };
+        google.setOnLoadCallback(function(){
+            drawChart({{ graph1 }},options12,"chart_div",genres);
+        });
+        google.setOnLoadCallback(function(){
+            drawChart({{ graph3 }},options12,"chart_div_2");
+        });
+        google.setOnLoadCallback(function(){
+            drawChart({{ graph2 }},options34,"chart_div_3",genres);
+        });
+        google.setOnLoadCallback(function(){
+            drawChart({{ graph4 }},options34,"chart_div_4");
+        });
+
+        function drawChart(rows,options,id,genres) {
+        //we can choose to not pass genres, and that means we want
+        //to print the users uploaded data
+            var data = new google.visualization.DataTable();
+            var genreMap = [-1, 1, 2, 1, 0, 3, 1, 1, 2, 1, 1, 4, 5, 3, 3, 0, 0, 0, 2, 3, 2];
+            var i;//for iteration
+{#            for(i = 0;i<rows.length;i++){#}
+{#                console.log(rows[i][0],rows[i][1]);#}
+{#            }#}
+            var row;//for assign each row into the "data" variable
+            var chart;
+
+            if(typeof genres!=='undefined') {
+                // if we pass genres into this function, we are going to plot the baseline distirbution of MASC
+                data.addColumn('number', 'X value');
+                data.addColumn('number', 'FC JK FT MS');
+                data.addColumn('number', 'BL ES GV JO NF NP');
+                data.addColumn('number', 'EM LT TW SM');
+                data.addColumn('number', 'SP CT DT');
+                data.addColumn('number', 'TG');
+                data.addColumn('number', 'TC');
+                data.addRows(rows.length)
+                for (i = 0; i < rows.length; i++) {
+                    row = rows[i];
+//console.log(genres[i] + " : " + row[0], row[1]);
+                    //Determine cluster
+                    var genreId = genres[i];
+                    var clusterId = genreMap[genreId] + 1;
+//console.log("genre Id + cluster ID : ", genreId, clusterId);
+                    data.setValue(i, 0, row[0]);
+                    data.setValue(i, clusterId, row[1]);
+                }
+                options.series = {
+                    0: {color: 'red'},
+                    1: {color: 'blue'},
+                    2: {color: 'FC2FFC'},
+                    3: {color: 'black'},
+                    4: {color: 'green'},
+                    5: {color: 'AF7B1E'}
+                };
+            }else{
+                // if we don't pass genre
+                data.addColumn('number', 'X value');
+                data.addColumn('number', 'User\'s data');
+                data.addRows(rows.length)
+                for (i = 0; i < rows.length; i++) {
+                    row = rows[i];
+                    console.log(row[0],row[1],i,row.length);
+                    data.setValue(i, 0, row[0]);
+                    data.setValue(i, 1, row[1]);
+                }
+                options.series = {
+                    0: {color: 'green'}
+                }
+            }
+            chart = new google.visualization.ScatterChart(document.getElementById(id));
+            chart.draw(data, options);
+        }
+
+    </script>
+
+    <title>Genre Variation Example</title>
+</head>
+<body>
+    <div class="row">
+      <div class="col-md-6">
+        <div id="chart_div" style="width: 650px; height: 500px;"></div>
+      </div>
+      <div class="col-md-6">
+        <div id="chart_div_2" style="width: 650px; height: 500px;"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div id="chart_div_3" style="width: 650px; height: 500px;"></div>
+      </div>
+      <div class="col-md-6">
+        <div id="chart_div_4" style="width: 650px; height: 500px;"></div>
+      </div>
+    </div>
+</body>
+</html>
+
+

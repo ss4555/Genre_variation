@@ -1,0 +1,7 @@
+<p>Uploading a file</p>
+
+<form action="{% url 'masc:read_csv' %}" method="post" name="file" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="uploadfile"/>
+    <input type="submit" value="Submit">
+</form>
